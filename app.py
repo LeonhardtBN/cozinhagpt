@@ -9,7 +9,7 @@ from langchain_community.chat_message_histories import ChatMessageHistory
 
 # 1. Configuração da Página
 st.set_page_config(page_title="CozinhaGPT", page_icon="🍳")
-st.title("🍳 CozinhaGPT")
+st.title("🍳 CozinheiroGPT")
 st.caption("Sua assistente de cozinha prática e criativa.")
 
 # 2. Carregar Variáveis de Ambiente
