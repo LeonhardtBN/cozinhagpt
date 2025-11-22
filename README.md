@@ -4,72 +4,97 @@
 
 A aplicação possui uma interface gráfica amigável construída com **Streamlit** e utiliza **LangChain** para gerenciar a memória da conversa e a interação com o modelo GPT da OpenAI.
 
+---
+
 ## ✨ Funcionalidades
 
-- **Geração de Receitas por Ingredientes:** Informe o que tem na geladeira e receba sugestões viáveis.
-- **Memória de Conversa:** O assistente lembra do contexto (ex: se você disse que não gosta de cebola no início, ele lembrará nas próximas sugestões).
-- **Adaptação a Restrições:** Sugere substituições para dietas veganas, sem glúten ou lactose.
-- **Interface Moderna:** Chat interativo estilo WhatsApp/ChatGPT rodando diretamente no navegador via Streamlit.
+- **Geração de receitas por ingredientes:** informe o que tem na geladeira e receba sugestões viáveis.
+- **Memória de conversa:** o assistente lembra do contexto (ex: se você disse que não gosta de cebola no início, ele evitará nas próximas sugestões).
+- **Adaptação a restrições alimentares:** sugestões para dietas veganas, sem glúten ou lactose.
+- **Interface moderna:** chat estilo WhatsApp/ChatGPT rodando diretamente no navegador via Streamlit.
+
+---
 
 ## 🛠️ Tecnologias Utilizadas
 
 - [Python 3.x](https://www.python.org/)
-- [Streamlit](https://streamlit.io/) (Interface Frontend)
-- [LangChain](https://www.langchain.com/) (Orquestração de LLMs)
-- [OpenAI API](https://openai.com/) (Modelo `gpt-4o-mini`)
-
-## 🚀 Como rodar o projeto
-
-### Pré-requisitos
-
-Você precisará de uma chave de API da OpenAI.
-
-### Instalação
-
-1. Clone este repositório:
-   ```bash
-   git clone [https://github.com/LeonhardtBN/cozinhagpt.git](https://github.com/LeonhardtBN/cozinhagpt.git)
-   cd cozinhagpt
-Crie um ambiente virtual (opcional, mas recomendado):
-
-Bash
-
-python -m venv venv
-# No Windows:
-venv\Scripts\activate
-# No Linux/Mac:
-source venv/bin/activate
-Instale as dependências:
-
-Bash
-
-pip install -r requirements.txt
-Configure as variáveis de ambiente: Crie um arquivo .env na raiz do projeto e adicione sua chave:
-
-OPENAI_API_KEY=sk-sua-chave-aqui
-Execute a aplicação:
-
-Bash
-
-streamlit run app.py
-📂 Estrutura do Projeto
-cozinha-gpt/
-├── app.py           # Código principal da aplicação Streamlit
-├── .env             # Arquivo de variáveis de ambiente (não comitar)
-├── requirements.txt # Lista de dependências do projeto
-└── README.md        # Documentação
-🤝 Contribuição
-Contribuições são bem-vindas! Sinta-se à vontade para abrir issues ou enviar pull requests com melhorias nas instruções de prompt ou na interface.
-
-📝 Licença
-Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
-
+- [Streamlit](https://streamlit.io/)
+- [LangChain](https://www.langchain.com/)
+- [OpenAI API](https://openai.com/) – modelo `gpt-4o-mini`
 
 ---
 
-### Dica Adicional: O arquivo `requirements.txt`
+## 🚀 Como Rodar o Projeto
 
-Para que o passo 3 da instalação funcione, você deve criar um arquivo chamado `requirements.txt` junto com seu código e colocar o seguinte conteúdo nele:
+### ⚙️ Pré-requisitos  
+Você precisará de uma chave de API da OpenAI.
+
+### 📦 Instalação
+
+1. Clone este repositório:
+
+   ```bash
+   git clone https://github.com/LeonhardtBN/cozinhagpt.git
+   cd cozinhagpt
+   ```
+
+2. Crie um ambiente virtual (opcional, mas recomendado):
+
+   ```bash
+   python -m venv venv
+
+   # No Windows:
+   venv\Scripts\activate
+
+   # No Linux/Mac:
+   source venv/bin/activate
+   ```
+
+3. Instale as dependências:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. Configure as variáveis de ambiente criando um arquivo `.env` na raiz do projeto:
+
+   ```bash
+   OPENAI_API_KEY=sk-sua-chave-aqui
+   ```
+
+5. Execute a aplicação:
+
+   ```bash
+   streamlit run app.py
+   ```
+
+---
+
+## 📂 Estrutura do Projeto
+
+```text
+cozinhagpt/
+├── app.py           # Código principal da aplicação Streamlit
+├── .env             # Variáveis de ambiente (não comitar)
+├── requirements.txt # Dependências do projeto
+└── README.md        # Documentação
+```
+
+---
+
+## 🤝 Contribuição
+
+Contribuições são bem-vindas! Sinta-se à vontade para abrir **issues** ou enviar **pull requests** com melhorias na interface ou instruções de prompt.
+
+---
+
+## 📝 Licença
+
+Este projeto está sob a licença **MIT**. Consulte o arquivo `LICENSE` para mais detalhes.
+
+---
+
+### 📌 Dica: conteúdo recomendado para o `requirements.txt`
 
 ```text
 streamlit
@@ -78,3 +103,4 @@ langchain-core
 langchain-community
 python-dotenv
 openai
+```
