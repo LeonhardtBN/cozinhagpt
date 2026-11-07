@@ -1,5 +1,6 @@
-langchain-core
-langchain-openai
-langchain-community
-python-dotenv
-streamlit
+streamlit>=1.46
+langchain-core>=0.3
+langchain-community>=0.3
+langchain-google-genai>=2.1
+python-dotenv>=1.0
+pytest>=8.0

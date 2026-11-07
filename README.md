@@ -2,16 +2,35 @@
 
 **CozinhaGPT** é um assistente virtual de culinária desenvolvido em Python. Ele utiliza Inteligência Artificial para sugerir receitas criativas, práticas e personalizadas com base apenas nos ingredientes que o usuário possui em casa.
 
-A aplicação possui uma interface gráfica amigável construída com **Streamlit** e utiliza **LangChain** para gerenciar a memória da conversa e a interação com o modelo GPT da OpenAI.
+A aplicação possui uma interface de chat construída com **Streamlit** e utiliza **LangChain** para gerenciar a memória da conversa e a interação com o **Gemini** (plano gratuito da API do Google).
+
+> 📸 _Coloque aqui um print ou GIF de uma conversa._
 
 ---
 
 ## ✨ Funcionalidades
 
-- **Geração de receitas por ingredientes:** informe o que tem na geladeira e receba sugestões viáveis.
-- **Memória de conversa:** o assistente lembra do contexto (ex: se você disse que não gosta de cebola no início, ele evitará nas próximas sugestões).
-- **Adaptação a restrições alimentares:** sugestões para dietas veganas, sem glúten ou lactose.
-- **Interface moderna:** chat estilo WhatsApp/ChatGPT rodando diretamente no navegador via Streamlit.
+- **Geração de receitas por ingredientes:** informe o que tem na geladeira e receba sugestões viáveis, com tempo, dificuldade e substituições.
+- **Memória de conversa:** o assistente lembra do contexto (ex.: se você disse que não gosta de cebola no início, ele evita nas próximas sugestões).
+- **Adaptação a restrições alimentares:** sugestões para dietas veganas, sem glúten ou sem lactose.
+- **Lista de compras:** ao final de cada receita, mostra o que falta comprar.
+- **Resposta em tempo real:** a receita aparece enquanto é escrita (streaming).
+- **Nova conversa:** botão para recomeçar do zero.
+
+---
+
+## 🧠 Como funciona
+
+```mermaid
+flowchart LR
+    U[Mensagem do usuário] --> H[RunnableWithMessageHistory<br/>últimas 20 mensagens da sessão]
+    H --> P[Prompt: instruções da CozinhaGPT<br/>+ histórico + mensagem]
+    P --> G[Gemini]
+    G -->|streaming| UI[Chat no Streamlit]
+```
+
+- O histórico de cada aba do navegador fica numa sessão própria (`session_id` único).
+- Só as últimas 20 mensagens vão para o modelo, para manter custo e velocidade sob controle em conversas longas.
 
 ---
 
@@ -20,14 +39,14 @@ A aplicação possui uma interface gráfica amigável construída com **Streamli
 - [Python 3.x](https://www.python.org/)
 - [Streamlit](https://streamlit.io/)
 - [LangChain](https://www.langchain.com/)
-- [OpenAI API](https://openai.com/) – modelo `gpt-4o-mini`
+- [Gemini API](https://ai.google.dev/) – modelo `gemini-3.8-flash` (plano gratuito)
 
 ---
 
 ## 🚀 Como Rodar o Projeto
 
-### ⚙️ Pré-requisitos  
-Você precisará de uma chave de API da OpenAI.
+### ⚙️ Pré-requisitos
+Uma chave da Gemini API, gratuita e sem cartão: [aistudio.google.com/apikey](https://aistudio.google.com/apikey).
 
 ### 📦 Instalação
 
@@ -56,10 +75,10 @@ Você precisará de uma chave de API da OpenAI.
    pip install -r requirements.txt
    ```
 
-4. Configure as variáveis de ambiente criando um arquivo `.env` na raiz do projeto:
+4. Copie o `.env.example` para `.env` e coloque sua chave:
 
    ```bash
-   OPENAI_API_KEY=sk-sua-chave-aqui
+   GEMINI_API_KEY=sua-chave-aqui
    ```
 
 5. Execute a aplicação:
@@ -68,39 +87,35 @@ Você precisará de uma chave de API da OpenAI.
    streamlit run app.py
    ```
 
+### 🧪 Testes
+
+```bash
+pytest -q
+```
+
+Os testes rodam sem chave de API, com um modelo falso no lugar do Gemini. Eles conferem a saudação, a memória de conversa (sem duplicar o histórico no prompt) e o botão de nova conversa.
+
 ---
 
 ## 📂 Estrutura do Projeto
 
 ```text
 cozinhagpt/
-├── app.py           # Código principal da aplicação Streamlit
-├── .env             # Variáveis de ambiente (não comitar)
-├── requirements.txt # Dependências do projeto
-└── README.md        # Documentação
+├── app.py            # Código principal da aplicação Streamlit
+├── tests/            # Testes automatizados
+├── .env.example      # Modelo das variáveis de ambiente
+├── requirements.txt  # Dependências do projeto
+└── README.md         # Documentação
 ```
 
 ---
 
 ## 🤝 Contribuição
 
-Contribuições são bem-vindas! Sinta-se à vontade para abrir **issues** ou enviar **pull requests** com melhorias na interface ou instruções de prompt.
+Contribuições são bem-vindas! Sinta-se à vontade para abrir **issues** ou enviar **pull requests** com melhorias na interface ou nas instruções do prompt.
 
 ---
 
 ## 📝 Licença
 
 Este projeto está sob a licença **MIT**. Consulte o arquivo `LICENSE` para mais detalhes.
-
----
-
-### 📌 Dica: conteúdo recomendado para o `requirements.txt`
-
-```text
-streamlit
-langchain-openai
-langchain-core
-langchain-community
-python-dotenv
-openai
-```
