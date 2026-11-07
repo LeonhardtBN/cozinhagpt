@@ -4,7 +4,8 @@
 
 A aplicação possui uma interface de chat construída com **Streamlit** e utiliza **LangChain** para montar o prompt com a memória da conversa e conversar com o **Gemini** (plano gratuito da API do Google).
 
-> 📸 _Coloque aqui um print ou GIF de uma conversa._
+<img width="1919" height="910" alt="image" src="https://github.com/user-attachments/assets/21da3895-d7db-4afd-b23f-e8429ce49570" />
+
 
 ---
 
