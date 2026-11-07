@@ -2,7 +2,7 @@
 
 **CozinhaGPT** é um assistente virtual de culinária desenvolvido em Python. Ele utiliza Inteligência Artificial para sugerir receitas criativas, práticas e personalizadas com base apenas nos ingredientes que o usuário possui em casa.
 
-A aplicação possui uma interface de chat construída com **Streamlit** e utiliza **LangChain** para gerenciar a memória da conversa e a interação com o **Gemini** (plano gratuito da API do Google).
+A aplicação possui uma interface de chat construída com **Streamlit** e utiliza **LangChain** para montar o prompt com a memória da conversa e conversar com o **Gemini** (plano gratuito da API do Google).
 
 > 📸 _Coloque aqui um print ou GIF de uma conversa._
 
@@ -23,13 +23,13 @@ A aplicação possui uma interface de chat construída com **Streamlit** e utili
 
 ```mermaid
 flowchart LR
-    U[Mensagem do usuário] --> H[RunnableWithMessageHistory<br/>últimas 20 mensagens da sessão]
+    U[Mensagem do usuário] --> H[Histórico da sessão<br/>últimas 20 mensagens]
     H --> P[Prompt: instruções da CozinhaGPT<br/>+ histórico + mensagem]
     P --> G[Gemini]
     G -->|streaming| UI[Chat no Streamlit]
 ```
 
-- O histórico de cada aba do navegador fica numa sessão própria (`session_id` único).
+- O histórico de cada aba do navegador fica na sessão do Streamlit e entra no prompt por um `MessagesPlaceholder`.
 - Só as últimas 20 mensagens vão para o modelo, para manter custo e velocidade sob controle em conversas longas.
 
 ---

@@ -5,9 +5,15 @@ from pathlib import Path
 import langchain_google_genai
 import pytest
 from langchain_core.language_models.fake_chat_models import FakeListChatModel
+import streamlit as st
 from streamlit.testing.v1 import AppTest
 
 APP = str(Path(__file__).resolve().parents[1] / "app.py")
+
+
+@pytest.fixture(autouse=True)
+def limpar_cache():
+    st.cache_resource.clear()  # cada teste cria a chain com o seu próprio modelo falso
 
 
 class ModeloFalso(FakeListChatModel):
@@ -62,3 +68,18 @@ def test_nova_conversa_limpa_o_chat(app):
     app.sidebar.button[0].click().run()
     assert [m.markdown[0].value for m in app.chat_message] == [app.chat_message[0].markdown[0].value]
     assert len(app.chat_message) == 1
+
+
+def test_erro_da_api_mostra_mensagem_em_vez_de_bolha_vazia(monkeypatch):
+    class ModeloQueFalha(FakeListChatModel):
+        def _stream(self, *a, **k):
+            raise RuntimeError("429 RESOURCE_EXHAUSTED")
+            yield  # noqa
+
+    monkeypatch.setenv("GEMINI_API_KEY", "teste")
+    monkeypatch.setattr(langchain_google_genai, "ChatGoogleGenerativeAI", lambda **kw: ModeloQueFalha(responses=["x"]))
+    at = AppTest.from_file(APP, default_timeout=30).run()
+    at.chat_input[0].set_value("ovo").run()
+    assert not at.exception
+    assert "limite gratuito" in at.error[0].value
+    assert len(at.session_state["messages"]) == 1  # a pergunta que falhou não fica presa no histórico

@@ -1,12 +1,8 @@
 import os
-import uuid
 
 import streamlit as st
 from dotenv import load_dotenv
-from langchain_community.chat_message_histories import ChatMessageHistory
-from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_google_genai import ChatGoogleGenerativeAI
 
 MODELO = os.getenv("MODELO", "gemini-3.8-flash")
@@ -45,29 +41,26 @@ def get_chain():
         MessagesPlaceholder(variable_name="history", n_messages=MENSAGENS_DE_CONTEXTO),
         ("human", "{input}"),
     ])
-    llm = ChatGoogleGenerativeAI(model=MODELO, temperature=0.7)
+    # Raciocínio "low" deixa a resposta bem mais rápida; poucas tentativas evitam esperas silenciosas no limite gratuito
+    llm = ChatGoogleGenerativeAI(model=MODELO, temperature=0.7, thinking_config={"thinking_level": "low"},
+                                 max_retries=2, timeout=90)
     return prompt | llm
 
 
-# Gerenciamento de Histórico do LangChain, guardado na sessão do Streamlit
-if "store" not in st.session_state:
-    st.session_state.store = {}
-if "session_id" not in st.session_state:
-    st.session_state.session_id = str(uuid.uuid4())  # uma conversa por aba do navegador
+def mensagem_de_erro(erro: Exception) -> str:
+    texto = str(erro)
+    if "429" in texto or "RESOURCE_EXHAUSTED" in texto:
+        return "O limite gratuito do Gemini foi atingido. Espere um minuto e tente de novo."
+    return f"Não consegui gerar a resposta ({type(erro).__name__}). Confira a GEMINI_API_KEY no .env."
 
 
-def get_session_history(session_id: str) -> BaseChatMessageHistory:
-    if session_id not in st.session_state.store:
-        st.session_state.store[session_id] = ChatMessageHistory()
-    return st.session_state.store[session_id]
-
-
-chain_with_history = RunnableWithMessageHistory(
-    get_chain(),
-    get_session_history,
-    input_messages_key="input",
-    history_messages_key="history",
-)
+def com_aviso_de_espera(pedacos):
+    """Mostra "pensando..." até o primeiro pedaço chegar; depois a resposta aparece aos poucos."""
+    with st.spinner("Pensando na receita..."):
+        primeiro = next(pedacos, None)
+    if primeiro is not None:
+        yield primeiro
+    yield from pedacos
 
 
 def texto_do_pedaco(pedaco) -> str:
@@ -81,7 +74,6 @@ def texto_do_pedaco(pedaco) -> str:
 # 4. Interface de Chat
 with st.sidebar:
     if st.button("Nova conversa", width="stretch"):
-        st.session_state.session_id = str(uuid.uuid4())
         st.session_state.messages = []
 
 if not st.session_state.get("messages"):
@@ -91,16 +83,20 @@ for msg in st.session_state.messages:
     st.chat_message(msg["role"]).write(msg["content"])
 
 if prompt := st.chat_input("Digite os ingredientes (ex: ovo, tomate, queijo)..."):
+    # Memória da conversa: as mensagens anteriores desta aba, guardadas na sessão do Streamlit
+    historico = [("human" if m["role"] == "user" else "ai", m["content"]) for m in st.session_state.messages]
     st.session_state.messages.append({"role": "user", "content": prompt})
     st.chat_message("user").write(prompt)
 
     # A resposta aparece aos poucos (streaming), em vez de esperar a receita inteira
     with st.chat_message("assistant"):
-        resposta = st.write_stream(
-            texto_do_pedaco(p) for p in chain_with_history.stream(
-                {"input": prompt},
-                config={"configurable": {"session_id": st.session_state.session_id}},
-            )
-        )
+        try:
+            resposta = st.write_stream(com_aviso_de_espera(
+                texto_do_pedaco(p) for p in get_chain().stream({"history": historico, "input": prompt})
+            ))
+        except Exception as erro:  # erro da API: mostra o motivo em vez de travar com a bolha vazia
+            st.session_state.messages.pop()
+            st.error(mensagem_de_erro(erro))
+            st.stop()
 
     st.session_state.messages.append({"role": "assistant", "content": resposta})
